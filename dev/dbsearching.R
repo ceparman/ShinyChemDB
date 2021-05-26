@@ -147,7 +147,7 @@ db2$index(add = '{"bit" : 1}')
 
 #Query bd
 
-mols <- parse.smiles(smiles[1])
+mols <- parse.smiles(smiles[13])
 
 
 qfp <- as.character(

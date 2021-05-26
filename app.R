@@ -1,6 +1,8 @@
 
 source("./global.R")
 
+options(shiny.port=9001)
+options(shiny.host = "192.168.1.70")
 
 # Define UI for application
     ui <- dashboardPage(
