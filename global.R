@@ -9,12 +9,11 @@ library(shinycssloaders)
 library(htmlwidgets)
 
 #tidyverse related libraries
-
-
+#options(repos = BiocManager::repositories())
 
 #chemistry related libraries
 library(BiocManager)
-#options(repos = BiocManager::repositories())
+
 
 library(ChemmineOB)
 
@@ -23,7 +22,12 @@ library(ChemmineR)
 
 library(fmcsR)
 
-molRefs = ChemmineOB::forEachMol("SMILES","C1CCCCC1\ttest-compound-name",identity)
+library(tools)
 
-print(ChemmineOB::fingerprint_OB(molRefs,"FP3"))
+
+
+useSMI <- function(session, element, jmeFile) {
+  session$sendCustomMessage(type = 'useSMI',
+                            message = list(el=element, jmeFile = jmeFile))
+}
 
