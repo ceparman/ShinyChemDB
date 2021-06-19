@@ -9,7 +9,7 @@ queryModuleUI <- function(id) {
 
 
           textInput(ns('smilesTextInput'), 'Smiles', width='100%'),
-          tags$textarea(id=ns('molFileTextInput'), rows=6, '', style='width: 100%'),
+          textAreaInput(ns('molFileTextInput'), "Mol File"),
           textInput(inputId =ns('jmeFileTextInput'), 'JME string', width='100%'),
           actionButton(ns('readclipButton'), 'Read Clipboard'),
           actionButton(ns('useSmiButton'), 'Search Smiles'),
@@ -20,8 +20,11 @@ queryModuleUI <- function(id) {
 
         mainPanel( fluidPage(
                     h3("Results"),
-                   tabsetPanel(),
-                   actionButton(ns("add"),"ADD")
+                   tabsetPanel(
+                       tabPanel(title = "Local dB Search",id =ns("local")),
+                       tabPanel(title = "PubChem Search", id  = ns("pubchem"))
+                   )
+
         )
 
         )
@@ -41,13 +44,6 @@ queryModuleServer <- function(id,clipboard) {
   ns<- NS(id)
 
 
-      observeEvent(input$add,
-
-
-
-
-
-                    )
 
 
 
