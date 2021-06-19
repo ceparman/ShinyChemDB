@@ -64,7 +64,7 @@ queryModuleServer <- function(id,clipboard) {
                   updateTextInput(session, 'smilesTextInput', value='')
                   updateTextInput(session, 'molFileTextInput', value='')
                   updateTextInput(session, 'jmeFileTextInput', value='')
-                  updateTextInput(session,'smilesTextInput',value = clipboard())
+                  updateTextInput(session,'smilesTextInput',value = clipboard$smiles)
                 })
 
       }
