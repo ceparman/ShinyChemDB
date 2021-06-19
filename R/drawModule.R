@@ -108,7 +108,7 @@ drawModuleServer <- function(id,clipboard) {
 
         observeEvent(input$useMolButton, useMOL(session, ns('jsmeElement'), input$molFileTextInput))
 
-        observeEvent(input$readclipButton, useMOL(session, ns('jsmeElement'), ChemmineOB::convertFormat("SMI","MOL", clipboard()) ) )
+        observeEvent(input$readclipButton, useMOL(session, ns('jsmeElement'), ChemmineOB::convertFormat("SMI","MOL", clipboard$smiles ) ) )
 
 
         observeEvent(input$clearEditorButton, {
@@ -135,7 +135,7 @@ drawModuleServer <- function(id,clipboard) {
 
      observeEvent(input$inputSmiles,{
                   output$test <- renderText(input$inputSmiles)
-                  clipboard(input$inputSmiles)
+                  clipboard$smiles <- input$inputSmiles
             })
 
       }

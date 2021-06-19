@@ -5,6 +5,7 @@
 #Shiny related libraries
 library(shiny)
 library(shinydashboard)
+library(shinydashboardPlus)
 library(shinycssloaders)
 library(htmlwidgets)
 

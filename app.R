@@ -14,7 +14,19 @@ options(shiny.host = "192.168.1.70")
               menuItem("Dashboard", tabName = "Dashboard", icon = icon("dashboard")),
               menuItem("Draw", tabName = "Draw", icon = icon("pencil-alt")),
               menuItem("Register", tabName = "Register", icon = icon("clipboard-list")),
-              menuItem("Query", tabName = "Query", icon = icon("search"))
+              menuItem("Query", tabName = "Query", icon = icon("search")),
+              box(
+                title = "Clipboard",
+                width=12,
+                id = "mybox",
+                collapsible = TRUE,
+                closable = FALSE,
+                background = "black",
+                "Smiles",
+                verbatimTextOutput("clip_smiles"),
+                "ID",
+                verbatimTextOutput("clip_id")
+              )
 
 
 
@@ -45,7 +57,10 @@ options(shiny.host = "192.168.1.70")
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
 
-clipboard <- reactiveVal(" ")
+clipboard <- reactiveValues( smiles = "", id = "")
+
+output$clip_smiles <- renderText(clipboard$smiles)
+output$clip_id <- renderText(clipboard$id)
 
 #Load modules
 
