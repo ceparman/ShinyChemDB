@@ -1,5 +1,14 @@
 
 
+generate_pubchem_values <- function(args){
+  pubchem_smiles_search(smiles = args$smiles,
+                        threshold = args$threshold,
+                        maxRecords = args$maxRecords,
+                        debug=args$debug)
+}
+
+
+
 queryModuleUI <- function(id) {
   ns <- NS(id)
   tagList(
@@ -56,6 +65,8 @@ queryModuleServer <- function(id,clipboard) {
 
     function(input, output, session) {
 
+      worker <- initialize_worker()
+
      ns<- NS(id)
 
       pubChemResult <- reactiveVal(NULL)
@@ -74,26 +85,50 @@ queryModuleServer <- function(id,clipboard) {
                   updateTextInput(session,'smilesTextInput',value = clipboard$smiles)
                 })
 
+      pubchem_values <- reactive( {
+        list( smiles = input$smilesTextInput,
+              threshold = input$threshold,
+              maxRecords = input$maxRecords,
+              debug=DEBUG
+           )
+      })
+
+
+      #Define promise for Pubchem results table
+      observeEvent(input$runPubChemQuery,{ pubchemValuesPromise <-  worker$run_job("generateValuesPromise",
+                                              generate_pubchem_values,
+                                              args_reactive = pubchem_values
+                                              )
 
 
 
-      observeEvent(input$runPubChemQuery,{
-
-        pubChemResult(pubchem_smiles_search(smiles = input$smilesTextInput,threshold = input$threshold,maxRecords = input$maxRecords,debug=DEBUG))
-
-
-        })
-
-       output$pubchemresult <- renderUI(
-
-                                   tagList(
-
-                                        DT::renderDataTable(pubChemResult())
+       output$pubchemresult <- renderUI({
+                                        t <-  pubchemValuesPromise()
 
 
+                                         if (!is.null(t$result)) {
+                                               tagList(  DT::renderDataTable(t$result))
+                                         } else{
+                                           tagList(fluidPage(
 
-                                 )
-                      )
+                                             fluidRow(
+                                               column(12,
+                                                      align = "center",
+                                               h3("Running PubMed Query")
+                                               )
+
+                                               ),
+
+                                                    HTML('<center> <img src="hug.gif"></center>'),
+
+                                                    )
+                                           )
+                                        }
+
+
+
+       })
+      })
 
 
 
