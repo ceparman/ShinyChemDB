@@ -8,6 +8,7 @@ library(shinydashboard)
 library(shinydashboardPlus)
 library(shinycssloaders)
 library(htmlwidgets)
+library(shiny.worker)
 
 #tidyverse related libraries
 #options(repos = BiocManager::repositories())
@@ -25,7 +26,9 @@ library(fmcsR)
 
 library(tools)
 
+DEBUG = T
 
+#initialize jme editor
 
 useSMI <- function(session, element, jmeFile) {
   session$sendCustomMessage(type = 'useSMI',

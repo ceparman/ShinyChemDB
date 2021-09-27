@@ -57,6 +57,10 @@ options(shiny.host = "192.168.1.70")
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
 
+
+
+
+#create element to hold internal clipboard contents
 clipboard <- reactiveValues( smiles = "", id = "")
 
 output$clip_smiles <- renderText(clipboard$smiles)
