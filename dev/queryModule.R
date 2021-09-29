@@ -33,7 +33,7 @@ queryModuleUI <- function(id) {
 
             ),
           fluidRow(
-          column(6,actionButton(ns("runPubChemQuery"),"Run PubChem Query")),
+          column(6,actionButton(ns("runPubChemQuery"),"Run PubChem Similarity Query")),
           column(6,actionButton(ns("runLocalQuery"),"Run local Query"))
           )
           ),

@@ -24,7 +24,9 @@ library(ChemmineR)
 
 library(fmcsR)
 
+library(dplyr)
 library(tools)
+library(httr2)
 
 DEBUG = T
 

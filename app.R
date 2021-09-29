@@ -7,14 +7,13 @@ options(shiny.host = "192.168.1.70")
 # Define UI for application
     ui <- dashboardPage(
 
-            dashboardHeader(),
-
+            dashboardHeader(title="ShinyChemDB"),
             dashboardSidebar(
               sidebarMenu(
               menuItem("Dashboard", tabName = "Dashboard", icon = icon("dashboard")),
               menuItem("Draw", tabName = "Draw", icon = icon("pencil-alt")),
               menuItem("Register", tabName = "Register", icon = icon("clipboard-list")),
-              menuItem("Query", tabName = "Query", icon = icon("search")),
+              menuItem("PubChem Query", tabName = "PubChemQuery", icon = icon("search")),
               box(
                 title = "Clipboard",
                 width=12,
@@ -41,8 +40,8 @@ options(shiny.host = "192.168.1.70")
                 tabItem(tabName = "Draw",
                         drawModuleUI("drawModule")
                 ),
-                tabItem(tabName = "Query",
-                        queryModuleUI("queryModule")
+                tabItem(tabName = "PubChemQuery",
+                        pubchemQueryModuleUI("pubchemQueryModule")
                 ),
 
                 tabItem(tabName = "Register",
@@ -70,7 +69,7 @@ output$clip_id <- renderText(clipboard$id)
 
 dashModuleServer("dashModule")
 
-queryModuleServer("queryModule",clipboard)
+pubchemQueryModuleServer("pubchemQueryModule",clipboard)
 
 drawModuleServer("drawModule",clipboard)
 
