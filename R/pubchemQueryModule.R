@@ -111,29 +111,39 @@ pubchemQueryModuleServer <- function(id,clipboard) {
                   updateTextInput(session,'smilesTextInput',value = clipboard$smiles)
                 })
 
+      # pubchem_values <- reactive( {
+      #   list( smiles = input$smilesTextInput,  #isolate values so you can make changes without rerunning
+      #         threshold = input$threshold,
+      #         maxRecords = input$maxRecords,
+      #         debug=DEBUG
+      #      )
+      # })
+
       pubchem_values <- reactive( {
-        list( smiles = input$smilesTextInput,  #isolate values so you can make changes without rerunning
-              threshold = input$threshold,
-              maxRecords = input$maxRecords,
+        list( smiles = isolate(input$smilesTextInput),  #isolate values so you can make changes without rerunning
+              threshold = isolate(input$threshold),
+              maxRecords = isolate(input$maxRecords),
+              input$runPubChemQuery,
               debug=DEBUG
-           )
+        )
+
       })
 
 
-      #Define promise for Pubchem results table
 
-      # observeEvent(input$runPubChemQuery,{ pubchemValuesPromise <-  worker$run_job("generateValuesPromise",
-      #                                         generate_pubchem_values,
-      #                                         args_reactive =  pubchem_values
-      #                                         )
 
-      reactive({input$runPubChemQuery
-               pubchemValuesPromise <-  worker$run_job("generateValuesPromise",
-                                                                                   generate_pubchem_values,
-                                                                                   args_reactive =  pubchem_values
-      )
 
-###########
+
+      # #Define promise for Pubchem results table
+
+     pubchemValuesPromise <-  worker$run_job("generateValuesPromise",
+                                           generate_pubchem_values,
+                                           args_reactive =   pubchem_values,
+                                           )
+
+
+
+     observeEvent(input$runPubChemQuery, priority = 0,{
 
        output$pubchemsimilarityresult <- renderUI({
                                         t <-  pubchemValuesPromise()
@@ -160,8 +170,8 @@ pubchemQueryModuleServer <- function(id,clipboard) {
 
 
 
-       })
-      })
+           }) #end render UI
+      })#end observe event
 
 
 
