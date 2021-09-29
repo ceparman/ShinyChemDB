@@ -110,21 +110,24 @@ pubchemQueryModuleServer <- function(id,clipboard) {
                 #  updateTextInput(session, 'sdfFileTextInput', value='')
                   updateTextInput(session,'smilesTextInput',value = clipboard$smiles)
                 })
-
-      pubchem_values <- reactive( {
-            input$unPubChemQuery
-        list( smiles = input$smilesTextInput,  #isolate values so you can make changes without rerunning
-              threshold = input$threshold,
-              maxRecords = input$maxRecords,
-              debug=DEBUG
-           )
-      })
+#
+#       pubchem_values <- reactive( {
+#         list( smiles = input$smilesTextInput,  #isolate values so you can make changes without rerunning
+#               threshold = input$threshold,
+#               maxRecords = input$maxRecords,
+#               debug=DEBUG
+#            )
+#       })
 
 
       #Define promise for Pubchem results table
       observeEvent(input$runPubChemQuery,{ pubchemValuesPromise <-  worker$run_job("generateValuesPromise",
                                               generate_pubchem_values,
-                                              args_reactive = pubchem_values
+                                              args_reactive =  list( smiles = input$smilesTextInput,  #isolate values so you can make changes without rerunning
+                                                                     threshold = input$threshold,
+                                                                     maxRecords = input$maxRecords,
+                                                                     debug=DEBUG
+                                              )
                                               )
 
 
