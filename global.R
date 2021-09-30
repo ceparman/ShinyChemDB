@@ -9,6 +9,7 @@ library(shinydashboardPlus)
 library(shinycssloaders)
 library(htmlwidgets)
 library(shiny.worker)
+library(shinyjs)
 
 #tidyverse related libraries
 #options(repos = BiocManager::repositories())
@@ -18,6 +19,7 @@ library(BiocManager)
 
 
 library(ChemmineOB)
+library(webchem)
 
 library(jsme)
 library(ChemmineR)

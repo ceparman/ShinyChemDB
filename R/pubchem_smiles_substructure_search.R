@@ -11,37 +11,54 @@ pubchem_smiles_substructure_search <- function(smiles,MatchIsotopes=F,MatchCharg
                                                maxRecords=20,debug=F){
 
 
+  convertLogical <- function(val) {
+    if (is.logical(val)) {
+      if (val == T) {
+        return("true")
+      } else {
+        return("false")
+      }
+
+
+    } else return(NULL)
+
+}
+
+
   if(debug) {print("running query")
-    print(paste(smiles,threshold,maxRecords))
+    print(paste(smiles,maxRecords,MatchIsotopes))
     }
 
   url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/substructure/smiles/",
                 smiles,
                 "/JSON",
-                "?MatchIsotopes=",MatchIsotopes,
-                "&MatchCharges=",MatchCharges,
-                "&MatchTautomers=",MatchTautomers,
-                "&RingsNotEmbedded=",RingsNotEmbedded,
-                "&SingleDoubleBondsMatch=",SingleDoubleBondsMatch,
-                "&ChainsMatchRings=",ChainsMatchRings,
-                "&StripHydrogen=",StripHydrogen,
+                "?MatchIsotopes=",convertLogical(MatchIsotopes),
+                "&MatchCharges=",convertLogical(MatchCharges),
+                "&MatchTautomers=",convertLogical(MatchTautomers),
+                "&RingsNotEmbedded=",convertLogical(RingsNotEmbedded),
+                "&SingleDoubleBondsMatch=",convertLogical(SingleDoubleBondsMatch),
+                "&ChainsMatchRings=",convertLogical(ChainsMatchRings),
+                "&StripHydrogen=",convertLogical(StripHydrogen),
                 "&Stereo=",Stereo,
                 "&MaxRecords=",maxRecords)
 
-  r1 <-httr2::req_perform(httr2::request(url) %>% httr2::req_method("POST"))
+  if(debug) {print(url)}
+
+
+  r1 <-httr2::request(url) %>%  httr2::req_options(http_version = 1) %>% httr2::req_method("POST") %>% httr2::req_perform()
 
   listkey <-  httr2::resp_body_json(r1)$Waiting$ListKey
 
 
   result_url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/listkey/",
                        listkey,"/cids/JSON")
-  r2 <-req_perform(httr2::request(result_url) %>% httr2::req_method("POST"))
+  r2 <-httr2::request(result_url)   %>% httr2::req_method("POST") %>% req_perform()
 
 
    while(!is.null(httr2::resp_body_json(r2)$Waiting$Message )){
 
 
-            r2 <-httr2::req_perform(httr2::request(result_url) %>% httr2::req_method("POST"))
+      r2 <-httr2::request(result_url) %>%  httr2::req_options(http_version = 1) %>% httr2::req_method("POST") %>% httr2::req_perform()
           Sys.sleep(2)
    }
 

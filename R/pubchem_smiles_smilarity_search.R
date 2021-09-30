@@ -18,24 +18,28 @@ pubchem_smiles_smilarity_search <- function(smiles,threshold =95,maxRecords=20,d
                 threshold,"&MaxRecords=",
                 maxRecords)
 
+  if(debug) {print(url)}
 
-  httr::set_config(httr::config(http_version = 0)) ## added to avoid Error in the HTTP2 framing layer
 
-  r1 <-httr2::req_perform(httr2::request(url) %>% httr2::req_method("POST"))
+  #httr::set_config(httr::config(http_version = 0)) ## added to avoid Error in the HTTP2 framing layer
+
+  r1 <-httr2::request(url) %>%  httr2::req_options(http_version = 1) %>%  httr2::req_method("POST") %>% httr2::req_perform()
 
   listkey <-  httr2::resp_body_json(r1)$Waiting$ListKey
 
 
   result_url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/listkey/",
                        listkey,"/cids/JSON")
-  r2 <-req_perform(httr2::request(result_url) %>% httr2::req_method("POST"))
+  r2 <-httr2::request(result_url) %>%  httr2::req_options(http_version = 1) %>% httr2::req_method("POST") %>% req_perform()
 
 
    while(!is.null(httr2::resp_body_json(r2)$Waiting$Message )){
 
 
-            r2 <-httr2::req_perform(httr2::request(result_url) %>% httr2::req_method("POST"))
-          Sys.sleep(2)
+     r2 <-httr2::request(result_url) %>% httr2::req_options(http_version = 1) %>% httr2::req_method("POST") %>% httr2::req_perform()
+
+
+           Sys.sleep(2)
    }
 
 cid_list <- unlist(resp_body_json(r2)$IdentifierList$CID)
