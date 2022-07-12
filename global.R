@@ -1,21 +1,24 @@
 
 
-
-
 #Shiny related libraries
 library(shiny)
 library(shinydashboard)
-library(shinydashboardPlus)
+#library(shinydashboardPlus)
 library(shinycssloaders)
 library(htmlwidgets)
 library(shiny.worker)
 library(shinyjs)
+library(shinyWidgets)
+library(mongolite)
+library(mongochem)
+
+
 
 #tidyverse related libraries
 #options(repos = BiocManager::repositories())
 
 #chemistry related libraries
-library(BiocManager)
+
 
 
 library(ChemmineOB)

@@ -122,7 +122,7 @@ pubchemQueryModuleServer <- function(id,clipboard) {
 
     function(input, output, session) {
 
-      worker <- initialize_worker()
+      worker <- shiny.worker::initialize_worker()
 
      ns<- NS(id)
 
@@ -196,7 +196,7 @@ pubchemQueryModuleServer <- function(id,clipboard) {
                                              fluidRow(
                                                column(12,
                                                       align = "center",
-                                               h3("Running PubMed Query")
+                                               h3("Running Simularity PubMed Query")
                                                )
 
                                                ),
@@ -233,7 +233,7 @@ pubchemQueryModuleServer <- function(id,clipboard) {
              fluidRow(
                column(12,
                       align = "center",
-                      h3("Running PubMed Query")
+                      h3("Running PubMed Substructure Query")
                )
 
              ),

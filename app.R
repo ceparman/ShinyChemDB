@@ -1,8 +1,11 @@
+library(BiocManager)
+options(repos = BiocManager::repositories())
+
 
 source("./global.R")
 
-options(shiny.port=9001)
-options(shiny.host = "192.168.1.70")
+#options(shiny.port=9001)
+#options(shiny.host = "192.168.1.70")
 
 # Define UI for application
     ui <- dashboardPage(
@@ -10,9 +13,10 @@ options(shiny.host = "192.168.1.70")
             dashboardHeader(title="ShinyChemDB"),
             dashboardSidebar(
               sidebarMenu(
-              menuItem("Dashboard", tabName = "Dashboard", icon = icon("dashboard")),
+              menuItem("Dashboard", tabName = "Dashboard", icon = icon("tachometer-alt")),
               menuItem("Draw", tabName = "Draw", icon = icon("pencil-alt")),
               menuItem("Register", tabName = "Register", icon = icon("clipboard-list")),
+              menuItem("Local Query", tabName = "LocalQuery", icon = icon("search")),
               menuItem("PubChem Query", tabName = "PubChemQuery", icon = icon("search")),
               box(
                 title = "Clipboard",
@@ -33,19 +37,29 @@ options(shiny.host = "192.168.1.70")
             ),
 
             dashboardBody(
+            #  setBackgroundImage(
+            #    src = "https://www.fillmurray.com/1920/1080",
+            #    shinydashboard = TRUE
+            #  ),
+
               tabItems(
                 tabItem(tabName = "Dashboard",
+
                        dashModuleUI("dashModule")
                        ),
                 tabItem(tabName = "Draw",
+
                         drawModuleUI("drawModule")
                 ),
                 tabItem(tabName = "PubChemQuery",
                         pubchemQueryModuleUI("pubchemQueryModule")
                 ),
+                tabItem(tabName = "LocalQuery",
+                        localQueryModuleUI("localQueryModule")
+                ),
 
                 tabItem(tabName = "Register",
-                           drawModuleUI("registerModule")
+                        registerModuleUI ("registerModule")
                 )
 
                    )
@@ -57,7 +71,21 @@ options(shiny.host = "192.168.1.70")
 server <- function(input, output,session) {
 
 
+#Connect to database
 
+  all_creds <- jsonlite::fromJSON(safer::decrypt_string(Sys.getenv("mongo_db_string")))
+  creds <-all_creds[["user"]]
+  #
+
+
+
+  db_info <- list (
+
+    dbscheme  = 'mongodb+srv://',
+    dbinstance =  '@cluster0.41ox5.mongodb.net',
+    dbname  = 'chemdb',
+    creds = creds
+  )
 
 #create element to hold internal clipboard contents
 clipboard <- reactiveValues( smiles = "", id = "")
@@ -71,9 +99,11 @@ dashModuleServer("dashModule")
 
 pubchemQueryModuleServer("pubchemQueryModule",clipboard)
 
+localQueryModuleServer("localQueryModule",clipboard,db_info)
+
 drawModuleServer("drawModule",clipboard)
 
-registerModuleServer("registerModule")
+registerModuleServer("registerModule",clipboard, db_info)
 
 }
 
