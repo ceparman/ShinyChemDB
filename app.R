@@ -88,6 +88,7 @@ server <- function(input, output,session) {
   )
 
 #create element to hold internal clipboard contents
+
 clipboard <- reactiveValues( smiles = "", id = "")
 
 output$clip_smiles <- renderText(clipboard$smiles)

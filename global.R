@@ -4,6 +4,7 @@
 library(shiny)
 library(shinydashboard)
 #library(shinydashboardPlus)
+library(reactable)
 library(shinycssloaders)
 library(htmlwidgets)
 library(shiny.worker)
@@ -11,6 +12,7 @@ library(shinyjs)
 library(shinyWidgets)
 library(mongolite)
 library(mongochem)
+library(jsonlite)
 
 
 

@@ -52,11 +52,10 @@ compound_url <- paste0("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/"
 
 table<- read.csv(compound_url)
 
-table$`Compound Page` <- paste0("https://pubchem.ncbi.nlm.nih.gov/#query=",table$CID)
+table$`Compound Page` <- paste0("https://pubchem.ncbi.nlm.nih.gov/compound/",table$CID)
 
+table
 
-
-  DT::datatable(data = table)
  }
 
 

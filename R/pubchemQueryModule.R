@@ -189,8 +189,36 @@ pubchemQueryModuleServer <- function(id,clipboard) {
 
 
                                          if (!is.null(t$result)) {
-                                               tagList(  DT::renderDataTable(t$result))
-                                         } else{
+
+                                          data <- t$result |>
+                                                   select ("CID","Compound Page","CanonicalSMILES","MolecularFormula","MolecularWeight")
+
+
+
+                                               tagList(
+
+                                                 reactable::reactable(
+                                                                      data,
+                                                                      columns = list(
+                                                                        CID = colDef(name = "PubChem ID"),
+                                                                        `Compound Page` = colDef(name = "Compound Page",
+                                                                                         html = TRUE, cell = function(value,index) {
+                                                                                      sprintf('<a href="%s" target="_blank">%s</a>',
+                                                                                                value,
+                                                                                                paste(data$`CID`[index], "Page"))
+                                                                                            }),
+                                                                        CanonicalSMILES = colDef(name = "Canonical SMILES"),
+                                                                        MolecularFormula = colDef(name = "Molecular Formula"),
+                                                                        MolecularWeight = colDef(name = "Molecular Weight")
+                                                                        )
+                                                 )
+
+
+
+
+                                                 )
+
+                                           } else{
                                            tagList(fluidPage(
 
                                              fluidRow(

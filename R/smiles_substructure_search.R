@@ -32,12 +32,6 @@
 smiles_substructure_search <- function(sim_db,smiles,max_mismatches = 2, threshold = .85,
                                        min_overlap_coefficient = .8,
                                        al=0,au=2,bl =0, bu=1,numParallel = 2){
-  print("local")
-  print(paste(smiles,max_mismatches, threshold,
-              min_overlap_coefficient,
-              al,au,bl, bu,numParallel))
-
-
 
      mols <- rcdk::parse.smiles(smiles)
 

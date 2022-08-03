@@ -1,0 +1,107 @@
+---
+title: "Molecule Summary"
+output:
+  pdf_document: default
+  html_document: default
+params:
+  ID: DB00006
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(mongochem)
+library(tidyr)
+library(dplyr)
+library(reactable)
+
+
+```
+
+
+
+```{r connect }
+
+
+
+all_creds <- jsonlite::fromJSON(safer::decrypt_string(Sys.getenv("mongo_db_string")))
+creds <-all_creds[["user"]]
+
+
+db_info <- list (
+
+  dbscheme  = 'mongodb+srv://',
+  dbinstance =  '@cluster0.41ox5.mongodb.net',
+  dbname  = 'chemdb',
+  creds = creds
+)
+
+url_path = paste0(db_info$dbscheme ,db_info$creds$user,":",db_info$creds$pass,db_info$dbinstance)
+
+
+db <- mongolite::mongo(db="chemdb",url = url_path ,collection = "molecules")
+
+
+
+
+```
+
+
+```{r query}
+
+molecule <- db$find( paste0('{"ID" : "',params$ID,'"}') )
+#molecule <- db$find( paste0('{"ID" : "DB00006"}') )
+
+
+```
+
+
+
+
+```{r Title, results="asis"}
+
+
+
+
+cat("\n\n## ", molecule$`Common name`,"\n")
+
+
+
+```
+
+
+
+```{r 2Dstructure,fig.align='center'}
+
+
+
+mongochem::plot_molecule(rcdk::parse.smiles(molecule$smiles),name = molecule$`Common name`)
+
+
+
+
+```
+
+
+```{r, properties,eval=FALSE}
+
+
+
+properties <- molecule %>% select(-mfp_count,-mfp_bits,-mol)  %>% select(
+                           "Common name", "ID","Id Type","Collection", "smiles", "Formula",
+                            "Molecular Weight", "Exact Mass","Atom Count" ,"Standard InChI Key",
+                             "Accession Numbers","CAS" ,"UNII" ,"Synonyms", "Formal Charge" )                       
+
+
+prop_table <- data.frame( Property = colnames(properties),
+                          Value = as.character(properties[1,]) ,
+                          check.names = F) 
+                            
+
+reactable::reactable(prop_table)
+
+```
+
+
+
+
