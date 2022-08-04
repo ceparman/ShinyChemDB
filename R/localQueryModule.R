@@ -113,7 +113,8 @@ localQueryModuleUI <- function(id) {
 
                     tabsetPanel(id=ns("results"),
                                 tabPanel(title = "Local Similarity Search", id  = ns("localsimilarity"),
-                                        uiOutput(ns("localsimilarityresult"))),
+                                        reactable::reactableOutput(ns("localsimilarityresult")),
+                                        shinyjs::hidden(actionButton(ns("copy_sim"),"Copy SMILES to clipboard"))),
                                 tabPanel(title = "Local Substructure Search",id =ns("localsubstructure"),
                                          uiOutput(ns("localsubstructure")))
 
@@ -139,7 +140,62 @@ localQueryModuleServer <- function(id,clipboard,db_info) {
 
      ns<- NS(id)
 
+     # Store search results
 
+     search_results <- reactiveValues()
+
+
+
+
+     sim_result_table <- reactive({
+
+
+       if( exists( "local_similarity_ValuesPromise")) {
+
+         t <-  local_similarity_ValuesPromise()
+
+
+         if (!is.null(t$result)) {
+
+           data <- t$result |>
+             select( "Common name", "tanimoto","ID","smiles", "Collection",
+                     "smiles", "Molecular Weight", "Formula","link" )
+
+
+           search_results$sim <- data
+
+           reactable::reactable(
+              data |> select(-link),
+             columns = list(
+
+               `Common name` = colDef(html = TRUE, cell = function(value,index) {
+                 sprintf('<a href="%s" target="_blank">%s</a>',  data$link[index],data$`Common name`[index])
+               }),
+
+               tanimoto = colDef(name = "Tanimoto Score"),
+               smiles= colDef(name = "Canonical SMILES"),
+               Collection = colDef(name ="Collection"),
+               ID = colDef(name = "ID"),
+               Formula = colDef(name = "Molecular Formula"),
+               `Molecular Weight`= colDef(name = "Molecular Weight")
+             ),
+             selection = "single", onClick = "select",
+             searchable = TRUE
+           )
+
+         }else {
+
+           reactable::reactable(data.frame(Message = "Searching"))
+
+         } } else {
+
+           reactable::reactable(data.frame(Message = "No Results"))
+         }
+
+
+
+
+     })
 
 
 
@@ -201,61 +257,7 @@ localQueryModuleServer <- function(id,clipboard,db_info) {
 
      observeEvent(input$runlocalQuery, priority = 0,{
 
-       output$localsimilarityresult <- renderUI({
-
-
-                                        t <-  local_similarity_ValuesPromise()
-
-                                          print(t$result)
-
-                                         if (!is.null(t$result)) {
-                                              if(nrow(t$result) == 0){
-                                                tagList(  h3("No Results Found!"))
-
-                                              }else {
-#Format table
-
-                                        data <- t$result |>
-                                          select( "Common name", "tanimoto","ID","smiles", "Collection",  "smiles", "Molecular Weight", "Formula","link" )
-
-                                        tagList(
-                                             reactable(
-                                                    data |> select(-link),
-                                                   columns = list(
-                                      # Or using raw HTML
-                                                 `Common name` = colDef(html = TRUE, cell = function(value,index) {
-                                                  sprintf('<a href="%s" target="_blank">%s</a>',  data$link[index],data$`Common name`[index])
-                                                 })
-                                              )
-                                          )
-
-
-
-                                        )
-
-                      }
-
-
-                                           } else{
-                                           tagList(fluidPage(
-
-                                             fluidRow(
-                                               column(12,
-                                                      align = "center",
-                                               h3("Running Local Similarity Query")
-                                               )
-
-                                               ),
-
-                                                    HTML('<center> <img src="hug.gif"></center>'),
-
-                                                    )
-                                           )
-                                        }
-
-
-
-           }) #end render UI
+       output$localsimilarityresult <- reactable::renderReactable( {  sim_result_table() })
 
 
 
@@ -305,7 +307,33 @@ localQueryModuleServer <- function(id,clipboard,db_info) {
      }) #end observe event
 
 
+     observeEvent(input$copy_sim,{
 
+       selected_row <-   getReactableState("localsimilarityresult")$selected
+
+
+       clipboard$smiles <- search_results$sim$smiles[selected_row]
+
+
+     })
+
+observe( {
+
+   req(getReactableState("localsimilarityresult"))
+
+  if(is.null(getReactableState("localsimilarityresult")$selected )) {
+    shinyjs::hide(id= "copy_sim")
+    shinyjs::disable(id= "copy_sim")
+
+  } else {
+
+    shinyjs::show(id= "copy_sim")
+    shinyjs::enable(id= "copy_sim")
+  }
+
+
+
+})
 
 
 }
