@@ -1,16 +1,5 @@
 
 
-generate_local_similarity_values <- function(args){
-                     local_similarity_search(smiles = args$smiles,
-                                             db_info = args$db_info,
-                                             threshold = args$threshold,
-                                             max_records=args$max_records
-                                             )
-}
-
-
-
-
 generate_local_substructure_values <- function(args){
                 local_smiles_substructure_search(smiles = args$smiles,
                                                  max_mismatches = args$max_mismatches,
@@ -29,7 +18,7 @@ generate_local_substructure_values <- function(args){
 
 
 
-localQueryModuleUI <- function(id) {
+localSubQueryModuleUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidPage(
@@ -49,30 +38,13 @@ localQueryModuleUI <- function(id) {
           column(6,numericInput(ns("maxRecords"),"Max. number of hits",min=1,max=100,step=1,value=20)
                  )
           ),
-          hr(),
-          h4("Similarity Search"),
-
-          fluidRow(
-                   column(6,numericInput(ns("threshold"),"Min. Tanimoto score",min = 40,max = 100,step = 5,value = 70))
-                   ),
-          fluidRow(
-                   column(6,actionButton(ns("runlocalQuery"),"Run Local Similarity Query"))
-          ),
-
-
 
           hr(),
 
           h3("Substructure Search"),
-          tabsetPanel(
 
-           tabPanel(id=ns("sim_search"),title = "Search",
-            hr(),
-            actionButton(ns("runlocalsubQuery"),"Run Local Substructure Query")
-             ),
+            actionButton(ns("runlocalsubQuery"),"Run Local Substructure Query"),
 
-
-          tabPanel(id=ns("sim_search_details"),title = "Search Options",
           h4("Initial Search"),
           fluidRow(
             column(6,numericInput(ns("sim_threshold"),"Smilarity threshold",min = 40,max = 100,step = 5,value = 70)),
@@ -97,12 +69,7 @@ localQueryModuleUI <- function(id) {
          )
 
 
-
-
-          )
-          )
-
-          ), #end sidepanel
+          ),
 
 
 
@@ -111,16 +78,12 @@ localQueryModuleUI <- function(id) {
           fluidPage(
                     h3("Results"),
 
-                    tabsetPanel(id=ns("results"),
-                                tabPanel(title = "Local Similarity Search", id  = ns("localsimilarity"),
-                                        reactable::reactableOutput(ns("localsimilarityresult")),
-                                        shinyjs::hidden(actionButton(ns("copy_sim"),"Copy SMILES to clipboard"))),
-                                tabPanel(title = "Local Substructure Search",id =ns("localsubstructure"),
-                                         uiOutput(ns("localsubstructure")))
+                     uiOutput(ns("localsubstructure"))
+                    )
+                        # shinyjs::hidden(actionButton(ns("copy_sim"),"Copy SMILES to clipboard"))),
 
-                         )
 
-              )
+
        ) #end main panel
 
 )
@@ -130,7 +93,7 @@ localQueryModuleUI <- function(id) {
 
 
 
-localQueryModuleServer <- function(id,clipboard,db_info) {
+localSubQueryModuleServer <- function(id,clipboard,db_info) {
   moduleServer(
     id,
 

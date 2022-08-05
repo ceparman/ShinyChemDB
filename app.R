@@ -16,8 +16,18 @@ source("./global.R")
               menuItem("Dashboard", tabName = "Dashboard", icon = icon("tachometer-alt")),
               menuItem("Draw", tabName = "Draw", icon = icon("pencil-alt")),
               menuItem("Register", tabName = "Register", icon = icon("clipboard-list")),
-              menuItem("Local Query", tabName = "LocalQuery", icon = icon("search")),
-              menuItem("PubChem Query", tabName = "PubChemQuery", icon = icon("search")),
+              menuItem("Local dB Searching",
+
+                 menuSubItem("Local Similarity Query", tabName = "LocalSimQuery", icon = icon("search")),
+                 menuSubItem("Local SubstructureQuery", tabName = "LocalSubQuery", icon = icon("search"))
+              ),
+
+              menuItem("PubChem dB Searching",
+                  menuSubItem("PubChem Similarity Query", tabName = "PubChemSimQuery", icon = icon("search")),
+                  menuSubItem("PubChem Substructure Query", tabName = "PubChemSubQuery", icon = icon("search"))
+                  ),
+
+
               box(
                 title = "Clipboard",
                 width=12,
@@ -51,11 +61,20 @@ source("./global.R")
 
                         drawModuleUI("drawModule")
                 ),
-                tabItem(tabName = "PubChemQuery",
-                        pubchemQueryModuleUI("pubchemQueryModule")
+
+                tabItem(tabName = "LocalSimQuery",
+                        localSimQueryModuleUI("localSimQueryModule")
                 ),
-                tabItem(tabName = "LocalQuery",
-                        localQueryModuleUI("localQueryModule")
+                tabItem(tabName = "LocalSubQuery",
+                        localSubQueryModuleUI("localSubQueryModule")
+                ),
+
+
+                tabItem(tabName = "PubChemSimQuery",
+                        pubchemSimQueryModuleUI("pubchemSimQueryModule")
+                ),
+                tabItem(tabName = "PubChemSubQuery",
+                        pubchemSubQueryModuleUI("pubchemSubQueryModule")
                 ),
 
                 tabItem(tabName = "Register",
@@ -98,9 +117,13 @@ output$clip_id <- renderText(clipboard$id)
 
 dashModuleServer("dashModule")
 
-pubchemQueryModuleServer("pubchemQueryModule",clipboard)
+pubchemSimQueryModuleServer("pubchemSimQueryModule",clipboard,db_info)
+pubchemSubQueryModuleServer("pubchemSubQueryModule",clipboard,db_info)
 
-localQueryModuleServer("localQueryModule",clipboard,db_info)
+
+localSimQueryModuleServer("localSimQueryModule",clipboard,db_info)
+
+localSubQueryModuleServer("localSubQueryModule",clipboard,db_info)
 
 drawModuleServer("drawModule",clipboard)
 

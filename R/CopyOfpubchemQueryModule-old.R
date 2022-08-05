@@ -101,13 +101,9 @@ pubchemQueryModuleUI <- function(id) {
 
                     tabsetPanel(id=ns("results"),
                                 tabPanel(title = "PubChem Similarity Search", id  = ns("pubchemsimilarity"),
-                                        reactable::reactableOutput(ns("pubchemsimilarityresult")),
-                                        shinyjs::hidden(actionButton(ns("copy_sim"),"Copy SMILES to clipboard"))
-
-                                ),
+                                        uiOutput(ns("pubchemsimilarityresult"))),
                                 tabPanel(title = "PubChem Substructure Search",id =ns("pubchemsubstructure"),
-                                         uiOutput(ns("pubchemsubstructure"))
-                                         )
+                                         uiOutput(ns("pubchemsubstructure")))
 
                          )
 
@@ -130,58 +126,6 @@ pubchemQueryModuleServer <- function(id,clipboard) {
 
      ns<- NS(id)
 
-# Store search results
-
-  search_results <- reactiveValues( )
-
-#Create search results table
-
-     sim_result_table <- reactive({
-
-
-       if( exists( "pubchem_similarity_ValuesPromise")) {
-
-         t <-  pubchem_similarity_ValuesPromise()
-
-         if (!is.null(t$result)) {
-
-           data <- t$result |>
-             select ("CID","Compound Page","CanonicalSMILES",
-                     "MolecularFormula","MolecularWeight")
-
-           search_results$sim <- data
-
-           reactable::reactable(
-             data,
-             columns = list(
-               CID = colDef(name = "PubChem ID"),
-               `Compound Page` = colDef(name = "Compound Page",
-                                        html = TRUE, cell = function(value,index) {
-                                          sprintf('<a href="%s" target="_blank">%s</a>',
-                                                  value,
-                                                  "PubChem Page")
-                                        }),
-               CanonicalSMILES = colDef(name = "Canonical SMILES"),
-               MolecularFormula = colDef(name = "Molecular Formula"),
-               MolecularWeight = colDef(name = "Molecular Weight")
-             ),
-             selection = "single", onClick = "select",
-             searchable = TRUE
-           )
-
-       }else {
-
-         reactable::reactable(data.frame(Message = "Searching"))
-
-       } } else {
-
-         reactable::reactable(data.frame(Message = "No Results"))
-       }
-
-
-
-
-     })
 
 
       observeEvent(input$clearFieldsButton, {
@@ -240,33 +184,59 @@ pubchemQueryModuleServer <- function(id,clipboard) {
 
      observeEvent(input$runPubChemQuery, priority = 0,{
 
-       output$pubchemsimilarityresult <- reactable::renderReactable( {  sim_result_table() })
+       output$pubchemsimilarityresult <- renderUI({
+                                        t <-  pubchem_similarity_ValuesPromise()
+
+
+                                         if (!is.null(t$result)) {
+
+                                          data <- t$result |>
+                                                   select ("CID","Compound Page","CanonicalSMILES",
+                                                           "MolecularFormula","MolecularWeight")
+
+                                               tagList(
+
+                                                 reactable::reactable(
+                                                                      data,
+                                                                      columns = list(
+                                                                        CID = colDef(name = "PubChem ID"),
+                                                                        `Compound Page` = colDef(name = "Compound Page",
+                                                                                         html = TRUE, cell = function(value,index) {
+                                                                                      sprintf('<a href="%s" target="_blank">%s</a>',
+                                                                                                value,
+                                                                                                "PubChem Page")
+                                                                                            }),
+                                                                        CanonicalSMILES = colDef(name = "Canonical SMILES"),
+                                                                        MolecularFormula = colDef(name = "Molecular Formula"),
+                                                                        MolecularWeight = colDef(name = "Molecular Weight")
+                                                                        )
+                                                 )
 
 
 
 
+                                                 )
 
-#
-#
-#                                            tagList(fluidPage(
-#
-#                                              fluidRow(
-#                                                column(12,
-#                                                       align = "center",
-#                                                h3("Running Simularity PubMed Query")
-#                                                )
-#
-#                                                ),
-#
-#                                                     HTML('<center> <img src="hug.gif"></center>'),
-#
-#                                                     )
-#                                            )
-#                                         }
-#
-#
+                                           } else{
+                                           tagList(fluidPage(
+
+                                             fluidRow(
+                                               column(12,
+                                                      align = "center",
+                                               h3("Running Simularity PubMed Query")
+                                               )
+
+                                               ),
+
+                                                    HTML('<center> <img src="hug.gif"></center>'),
+
+                                                    )
+                                           )
+                                        }
 
 
+
+           }) #end render UI
 
 
 
@@ -310,36 +280,8 @@ pubchemQueryModuleServer <- function(id,clipboard) {
      }) #end observe event
 
 
-observeEvent(input$copy_sim,{
-
-selected_row <-   getReactableState("pubchemsimilarityresult")$selected
 
 
-clipboard$smiles <- search_results$sim$CanonicalSMILES[selected_row]
-
-
-})
-
-
-
-
-observe( {
-
-  req(getReactableState("pubchemsimilarityresult"))
-
-  if(is.null(getReactableState("pubchemsimilarityresult")$selected )) {
-    shinyjs::hide(id= "copy_sim")
-    shinyjs::disable(id= "copy_sim")
-
-  } else {
-
-    shinyjs::show(id= "copy_sim")
-    shinyjs::enable(id= "copy_sim")
-  }
-
-
-
-})
 
 }
 )}

@@ -32,6 +32,7 @@ library(ChemmineR)
 library(fmcsR)
 
 library(dplyr)
+library(purrr)
 library(tools)
 library(httr2)
 
